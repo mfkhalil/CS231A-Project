@@ -5,8 +5,8 @@ Currently, the lift that is implemented is the Bent-Over Row.
 
 To run the code, make sure you have MediaPipe installed. This can be done with
 
-<pip install mediapipe>
+```pip install mediapipe```
 
 Then, in your terminal, run
 
-<python3 compare.py>
+```python3 compare.py```
