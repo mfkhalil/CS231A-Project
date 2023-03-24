@@ -3,7 +3,7 @@ import numpy as np
 from landmarks import *
 
 # Angle margin of error, change as needed
-MARGIN_OF_ERROR = 8
+MARGIN_OF_ERROR = 10
 
 JOINTS = {
     # Only joints relevant to dumbbell row were added, feel free to add more as needed
@@ -23,7 +23,8 @@ def angle_between_lines(a, b, c):
     vector_bc = vector(b, c)
     cos_angle = vector_ab.dot(vector_bc) / (np.linalg.norm(vector_ab) * np.linalg.norm(vector_bc))
     angle = math.degrees(math.acos(cos_angle))
-    return angle
+    if angle < 90: return angle
+    return 180 - angle
 
 
 def landmark_as_array(output, landmark):
@@ -47,44 +48,46 @@ t_end = get_landmarks('t_end.png')
 def check_angle(jointname):
     joint = JOINTS[jointname]
 
-    right_start_one = landmark_as_array(bl_start, joint[0])
-    right_start_two = landmark_as_array(bl_start, joint[1])
-    right_start_three = landmark_as_array(bl_start, joint[2])
+    start_one = landmark_as_array(bl_start, joint[0])
+    start_two = landmark_as_array(bl_start, joint[1])
+    start_three = landmark_as_array(bl_start, joint[2])
 
-    right_end_one = landmark_as_array(bl_end, joint[0])
-    right_end_two = landmark_as_array(bl_end, joint[1])
-    right_end_three = landmark_as_array(bl_end, joint[2])
+    end_one = landmark_as_array(bl_end, joint[0])
+    end_two = landmark_as_array(bl_end, joint[1])
+    end_three = landmark_as_array(bl_end, joint[2])
 
-    bl_angle_start = angle_between_lines(right_start_three, right_start_two, right_start_one)
-    print('Baseline ' + jointname + ' angle at start position is ' +
-          str(bl_angle_start) + ' degrees.')
+    bl_angle_start = round(angle_between_lines(start_three, start_two, start_one), 2)
+    bl_start_str = 'Baseline ' + jointname + ' angle at start position is ' + str(bl_angle_start) + ' degrees.'
 
-    bl_angle_end = angle_between_lines(right_end_three, right_end_two, right_end_one)
-    print('Baseline ' + jointname + ' angle at end position is ' +
-          str(bl_angle_end) + ' degrees.')
+    bl_angle_end = round(angle_between_lines(end_three, end_two, end_one), 2)
+    bl_end_str = 'Baseline ' + jointname + ' angle at end position is ' + str(bl_angle_end) + ' degrees.'
 
-    right_start_one = landmark_as_array(t_start, joint[0])
-    right_start_two = landmark_as_array(t_start, joint[1])
-    right_start_three = landmark_as_array(t_start, joint[2])
+    start_one = landmark_as_array(t_start, joint[0])
+    start_two = landmark_as_array(t_start, joint[1])
+    start_three = landmark_as_array(t_start, joint[2])
 
-    right_end_one = landmark_as_array(t_end, joint[0])
-    right_end_two = landmark_as_array(t_end, joint[1])
-    right_end_three = landmark_as_array(t_end, joint[2])
+    end_one = landmark_as_array(t_end, joint[0])
+    end_two = landmark_as_array(t_end, joint[1])
+    end_three = landmark_as_array(t_end, joint[2])
 
-    t_angle_start = angle_between_lines(right_start_three, right_start_two, right_start_one)
-    print('Test ' + jointname + ' angle at start position is ' +
-          str(t_angle_start) + ' degrees.')
+    t_angle_start = round(angle_between_lines(start_three, start_two, start_one), 2)
+    t_start_str = 'Input ' + jointname + ' angle at start position is ' + str(t_angle_start) + ' degrees.'
 
-    t_angle_end = angle_between_lines(right_end_three, right_end_two, right_end_one)
-    print('Test ' + jointname + ' angle at end position is ' +
-          str(t_angle_end) + ' degrees.')
+    t_angle_end = round(angle_between_lines(end_three, end_two, end_one), 2)
+    t_end_str = 'Input ' + jointname + ' angle at end position is ' + str(t_angle_end) + ' degrees.'
 
+    print(bl_start_str)
+    print(t_start_str)
     if abs(t_angle_start - bl_angle_start) > MARGIN_OF_ERROR:
-        print('Your ' + jointname + ' start position was off. Please adjust by ' +
-              str(abs(t_angle_start - bl_angle_start) - MARGIN_OF_ERROR) + ' degrees!')
+        print('Your ' + jointname + ' start position was off. Please adjust by at least ' +
+              str(round(abs(t_angle_start - bl_angle_start) - MARGIN_OF_ERROR)) + ' degrees!')
+    print('\n')
+
+    print(bl_end_str)
+    print(t_end_str)
     if abs(t_angle_end - bl_angle_end) > MARGIN_OF_ERROR:
-        print('Your ' + jointname + ' end position was off. Please adjust by ' +
-              str(abs(t_angle_start - bl_angle_start) - MARGIN_OF_ERROR) + ' degrees!')
+        print('Your ' + jointname + ' end position was off. Please adjust by at least ' +
+              str(round(abs(t_angle_end - bl_angle_end) - MARGIN_OF_ERROR)) + ' degrees!')
     print('\n')
     return
 
